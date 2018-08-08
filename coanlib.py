@@ -16,6 +16,8 @@ def functions(lines):
     for l in lines:
 
         fs = l
+        # remove comments
+        re.sub("#.*", "", fs)
 
         if re.match(" *def ", fs) is not None:
 

@@ -13,23 +13,16 @@ def functions(lines):
 
     functions = []
 
-    lines_nocom = remove_comments(lines)
+    lines_stripped = remove_strings(lines)
+    lines_nocom = remove_comments(lines_stripped)
+    one_line = concatenate_codelines(lines_nocom)
 
-    for l in lines_nocom:
-
-        if re.match(" *def ", l) is not None:
-
-            # remove space before def and after
-            l = re.sub(" *def ", "", l)
-
-            # remove double-comma and things after that and EOL
-            # assume no double-comma used in function definition
-            l = re.sub(":.*\n", "", l)
-            functions.append(l)
+    functions = re.findall("def [^\:]*", one_line)
 
     return functions
 
 def remove_comments(codelines):
+    """ Removes all comments from the code. """
 
     lines_removed = []
     for l in codelines:
@@ -40,6 +33,7 @@ def remove_comments(codelines):
     return lines_removed
 
 def concatenate_codelines(codelines):
+    """ Compresses a list of strings into one string. """
 
     codeline = ""
 
@@ -49,6 +43,7 @@ def concatenate_codelines(codelines):
     return codeline
 
 def calculate_count(expr, codelines):
+    """ Calculates occurrences of expr in codelines. (max 1/line) """
 
     count = 0
     for l in codelines:
@@ -58,6 +53,7 @@ def calculate_count(expr, codelines):
     return count
 
 def remove_strings(codelines):
+    """ Removes strings from the code. """
 
     reg = re.compile("\"[^\"]*\"")
     
@@ -69,6 +65,7 @@ def remove_strings(codelines):
     return newlines
 
 def code_statistics(filepath):
+    """ Print statistics about the code. [more coming] """
 
     c = read_codelines(filepath)
 

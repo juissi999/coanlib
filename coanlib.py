@@ -9,7 +9,7 @@ def read_codelines(filepath):
     return lines
 
 def functions(lines): 
-    """ Lists all the functions in the code. """
+    """ Lists all the functions in codelines. """
 
     functions = []
 
@@ -22,7 +22,7 @@ def functions(lines):
     return functions
 
 def remove_comments(codelines):
-    """ Removes all comments from the code. """
+    """ Removes all comments from codelines. """
 
     lines_removed = []
     for l in codelines:
@@ -64,6 +64,44 @@ def remove_strings(codelines):
 
     return newlines
 
+def imports(codelines):
+    
+    imps = []
+    for l in codelines:
+        if re.search("import [^\s]*", l) is not None:
+            imps.append(l)
+
+    return imps
+
+def remove_eols(string):
+
+    if isinstance(string, str):
+        return(re.sub("\n", " ", string))
+    else:
+        newlist = []
+        for s in string:
+            newlist.append(re.sub("\n", " ", s))
+        return newlist
+
+def function_calls(lines):
+    """ Return all function calls from codelines. """
+
+    # remove strings    
+    # remove comments
+    # remove function definitions
+
+#    lines_stripped = remove_strings(lines)
+    lines_nocom = remove_comments(lines) #_stripped
+    one_line = concatenate_codelines(lines_nocom)
+
+    one_line = re.sub("def [^\:]*", "", one_line)
+
+    calls = re.findall("[a-zA-Z]*[a-zA-Z0-9]*\([^\)]*\)", one_line)
+
+    return calls
+
+
+
 def code_statistics(filepath):
     """ Print statistics about the code. [more coming] """
 
@@ -72,12 +110,27 @@ def code_statistics(filepath):
     c_stripped = remove_strings(c)
     commentlinec = calculate_count(" *#", c_stripped)
     trailing_commentc = calculate_count("(.*)#", c_stripped) - commentlinec
-    fcs = functions(c)
 
     print("Source code contains %d commentlines" % commentlinec)
     print("Source code contains %d trailing comments" % trailing_commentc)
-    print("Source code contains %d functions" % len(fcs))
-    print("Functions listed:")
 
+#    c_no_str_no_coms = remove_comments(c_stripped)
+    no_coms = remove_comments(c)
+    fcs = functions(no_coms)
+
+    print("\nSource code contains %d functions" % len(fcs))
+    print("Function definitions listed:")
     for i in fcs:
+        print(" " + i)
+
+    imps = imports(remove_eols(no_coms))
+    print("\nSource code contains %d imports" % len(imps))
+    print("Imports listed:")
+    for i in imps:
+        print(" " + i)
+
+    calls = function_calls(c)
+    print("\nFunction calls:")
+#
+    for i in calls:
         print(" " + i)
